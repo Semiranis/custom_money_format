@@ -28,14 +28,14 @@ import frappe
 from frappe.utils.data import cint, get_number_format_info, flt, cstr
 
 
-def custom_fmt_money(amount, precision=None, currency=None):
+def custom_fmt_money(amount, precision=None, currency=None, format=None):
 	# Below code is copied from frappe/utils/data.py fmt_money and modified.
 	# Modified lines (in the end) are marked.
 
 	"""
 	Convert to string with commas for thousands, millions etc
 	"""
-	number_format = frappe.db.get_default("number_format") or "#,###.##"
+	number_format = format or frappe.db.get_default("number_format") or "#,###.##"
 	if precision is None:
 		precision = cint(frappe.db.get_default('currency_precision')) or None
 
@@ -48,7 +48,7 @@ def custom_fmt_money(amount, precision=None, currency=None):
 	# 40,000.00000 -> 40,000.00
 	# 40,000.23000 -> 40,000.23
 
-	if isinstance(amount, string_types):
+	if isinstance(amount, str):
 		amount = flt(amount, precision)
 
 	if decimal_str:
