@@ -1,0 +1,22 @@
+HOW IT WORKS
+
+This app replaces standard client-side and server-side functions with custom versions. 
+In server-side it uses monkey patching. 
+In client-side it uses built-in frappe option to inject custom js files.
+
+Difference between original versions and custom versions:
+Original functions "format_currency" (js) and "fmt_money" (py and js; deprecated in js) returned strings containing currency symbol and formatted amount. Custom versions return formatted amount and currency code. 
+In case of python function, the changes are minor. Original function is quite long, including number formatting and the symbol was added in original version just before return. In custom version, the symbol variable is not used and string is created using currency code.
+In case of js file, the function is quite short, because all the number formatting is made in other place. The changes are similar: symbol variable is omitted, and string is composed from formatted amount and currency code.
+
+Client side details:
+In hooks.py there is a custom js file path assigned to an appropriate variable. If the app is installed, this file is loaded by frappe during every start up.
+The custom js file (custom_number_format.js) contains modified version of built-in function "format_currency" from apps/frappe/frappe/public/js/frappe/utils/number_format.js and its old name "fmt_money" (for backward compatibility). Both are assigned to "window" object.
+
+Server side details:
+It uses "monkey patching". The functions are swapped in hooks.py file.
+The function fmt_money from apps/frappe/frappe/utils/data.py is replaced with custom version loaded from apps/custom_money_format/custom_money_format/modified_scripts/data.py
+
+Why not patching in __init__.py?
+There was a side effect: the functions were replaced even if the app was uninstalled. Frappe loads the modules in some point, so it fires up the __init__.py content. Moving the patching to hooks.py fixed the problem.
+

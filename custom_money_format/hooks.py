@@ -15,6 +15,20 @@ app_license = "MIT"
 # ------------------
 app_include_js = "/assets/custom_money_format/js/custom_number_format.js"
 
+# Monkey patching
+# ------------------
+# Imports specific to the patches
+import frappe.utils.data
+import custom_money_format.modified_scripts.data
+
+# Replace frappe function with custom function
+frappe.utils.data.fmt_money = custom_money_format.modified_scripts.data.custom_fmt_money
+
+# frappe/utils/__init__.py imports functions from data.py into
+# frappe.utils namespace (calls "from frappe.utils.data import *"),
+# so the "shorter version" has to be replaced, too.
+frappe.utils.fmt_money = custom_money_format.modified_scripts.data.custom_fmt_money
+
 
 # User Data Protection
 # --------------------
